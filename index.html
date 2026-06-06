@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Standup Tracker</title>
+
+    <link rel="stylesheet" href="Style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body data-theme="dark">
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <span>📊</span>
+            </div>
+
+            <div>
+                <h1>Daily Standup Tracker</h1>
+                <p>PMO Developer Status Management Portal</p>
+            </div>
+        </div>
+
+        <div class="header-right">
+
+            <button id="themeToggle" class="theme-btn">
+                🌙 Dark Mode
+            </button>
+
+        </div>
+    </header>
+
+    <!-- DASHBOARD CARDS -->
+    <section class="dashboard">
+
+        <div class="card stat-card">
+            <h3>Developers Updated</h3>
+            <h2 id="updatedCount">0</h2>
+        </div>
+
+        <div class="card stat-card">
+            <h3>Pending Updates</h3>
+            <h2 id="pendingCount">0</h2>
+        </div>
+
+        <div class="card stat-card">
+            <h3>Total Entries</h3>
+            <h2 id="entryCount">0</h2>
+        </div>
+
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main class="container">
+
+        <!-- LEFT PANEL -->
+        <section class="card form-card">
+
+            <div class="section-header">
+                <h2>Developer Standup Update</h2>
+                <span id="currentDate"></span>
+            </div>
+
+            <form id="standupForm">
+
+                <!-- Developer Selection -->
+                <div class="form-group">
+
+                    <label>
+                        Developer Name
+                    </label>
+
+                    <div class="developer-row">
+
+                        <select id="developer" required>
+                            <option value="">
+                                Select Developer
+                            </option>
+                        </select>
+
+                        <button type="button" id="openDeveloperModal" class="secondary-btn">
+                            + Add Developer
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <!-- Completed Tasks -->
+                <div class="form-group">
+                    <label>
+                        Completed Tasks
+                    </label>
+
+                    <textarea id="completedTasks" placeholder="Enter completed tasks..." required></textarea>
+                </div>
+
+                <!-- In Progress -->
+                <div class="form-group">
+                    <label>
+                        Current In Progress Tasks
+                    </label>
+
+                    <textarea id="inProgressTasks" placeholder="Enter current progress..." required></textarea>
+                </div>
+
+                <!-- Deliverables -->
+                <div class="form-group">
+                    <label>
+                        Today's Deliverables
+                    </label>
+
+                    <textarea id="deliverables" placeholder="Expected deliverables for today..." required></textarea>
+                </div>
+
+                <!-- Blockers -->
+                <div class="form-group">
+                    <label>
+                        Blockers / Dependencies
+                    </label>
+
+                    <textarea id="blockers" placeholder="Enter blockers or type '-'" required></textarea>
+                </div>
+
+                <!-- Clarifications -->
+                <div class="form-group">
+                    <label>
+                        Clarifications Required
+                    </label>
+
+                    <textarea id="clarifications" placeholder="Enter clarifications or type '-'" required></textarea>
+                </div>
+
+                <!-- Buttons -->
+                <div class="action-buttons">
+
+                    <button type="submit" class="primary-btn">
+                        Save Update
+                    </button>
+
+                    <button type="button" id="generateSummary" class="secondary-btn">
+                        Generate Teams Summary
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <!-- RIGHT PANEL -->
+        <section class="card summary-card">
+
+            <div class="section-header">
+                <h2>Teams Summary Preview</h2>
+
+                <button id="copySummary" class="secondary-btn">
+                    Copy
+                </button>
+            </div>
+
+            <div id="summaryOutput" class="summary-output">
+                Developer summary will appear here...
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- DAILY SUMMARY SECTION -->
+    <section class="daily-summary-section">
+
+        <div class="card">
+
+            <div class="section-header">
+
+                <h2>
+                    Director Daily Summary
+                </h2>
+
+                <button id="generateDirectorSummary" class="primary-btn">
+                    Generate Daily Summary
+                </button>
+
+            </div>
+
+            <div id="directorSummaryOutput" class="summary-output">
+                Daily summary will appear here...
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ADD DEVELOPER MODAL -->
+    <div id="developerModal" class="modal">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h2>Add Developer</h2>
+
+                <button id="closeDeveloperModal" class="close-btn">
+                    ✕
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <label>
+                    Developer Name
+                </label>
+
+                <input type="text" id="newDeveloperName" placeholder="Enter developer name">
+
+                <button id="saveDeveloper" class="primary-btn modal-save-btn">
+                    Save Developer
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- LOADER -->
+    <div id="loader" class="loader-overlay hidden">
+
+        <div class="loader-card">
+            <div class="spinner"></div>
+            <p>Please wait...</p>
+        </div>
+
+    </div>
+
+    <!-- SUCCESS TOAST -->
+    <div id="toast" class="toast">
+        Saved Successfully
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p>
+            Daily Standup Tracker • PMO Management Portal
+        </p>
+    </footer>
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
