@@ -1,5 +1,7 @@
 const TRACKER_SHEET = "Standup_Tracker";
 const DEVELOPERS_SHEET = "Developers";
+const NOTES_SHEET = "Notes";
+const TODO_SHEET = "TO DO";
 
 /* =========================================
    SHEETS INITIALIZATION
@@ -11,18 +13,18 @@ function setupSheets() {
   const sheetsConfig = [
     {
       name: "Standup_Tracker",
-      headers: ["ID", "Date", "Developer", "Completed Tasks", "In Progress Tasks", "Deliverables", "Blockers", "Clarifications", "Timestamp", "Comments", "Status"]
+      headers: ["ID", "Date", "Developer", "Completed Tasks", "In Progress", "Deliverables", "Status", "Blockers", "Clarifications", "Comments", "Timestamp"]
     },
     {
       name: "Developers",
       headers: ["ID", "Developer Name"]
     },
     {
-      name: "Notes",
+      name: NOTES_SHEET,
       headers: ["ID", "Title", "Content", "Created Date", "Status", "Timestamp"]
     },
     {
-      name: "TodoList",
+      name: TODO_SHEET,
       headers: ["ID", "Title", "Description", "Assigned By", "Priority", "Due Date", "Status", "Created Date", "Timestamp"]
     }
   ];
@@ -33,10 +35,9 @@ function setupSheets() {
       sheet = ss.insertSheet(config.name);
     }
     
-    // Setup headers and styling if sheet is empty or only has headers
-    if (sheet.getLastRow() <= 1) {
-      sheet.clearContents();
-      sheet.appendRow(config.headers);
+    const firstCell = sheet.getRange(1, 1).getValue();
+    if (sheet.getLastRow() === 0 || firstCell === "") {
+      sheet.getRange(1, 1, 1, config.headers.length).setValues([config.headers]);
       
       // Style headers: bold, dark background, white text, frozen row 1
       const headerRange = sheet.getRange(1, 1, 1, config.headers.length);
@@ -53,7 +54,9 @@ function setupSheets() {
 ========================================= */
 
 function doGet(e) {
-  const action = e.parameter.action;
+  setupSheets();
+
+  const action = String((e && e.parameter && e.parameter.action) || "").trim();
 
   switch (action) {
     case "getDevelopers":
@@ -77,7 +80,7 @@ function doGet(e) {
     default:
       return createResponse({
         success: false,
-        message: "Invalid Action"
+        message: `Invalid action: ${action || "(missing)"}`
       });
   }
 }
@@ -88,9 +91,12 @@ function doGet(e) {
 
 function doPost(e) {
   try {
-    const data = JSON.parse(e.postData.contents);
+    setupSheets();
 
-    switch (data.action) {
+    const data = JSON.parse(e.postData.contents || "{}");
+    const action = String(data.action || "").trim();
+
+    switch (action) {
       case "saveStandup":
         return createResponse(saveStandup(data));
 
@@ -133,7 +139,7 @@ function doPost(e) {
       default:
         return createResponse({
           success: false,
-          message: "Unknown Action"
+          message: `Unknown action: ${action || "(missing)"}`
         });
     }
   } catch (error) {
@@ -173,7 +179,10 @@ function getNextId(sheet) {
 function parseDateString(dateStr) {
   if (!dateStr) return new Date(0);
   const parts = dateStr.split(" ");
-  if (parts.length < 3) return new Date(dateStr) || new Date(0);
+  if (parts.length < 3) {
+    const parsed = new Date(dateStr);
+    return isNaN(parsed) ? new Date(0) : parsed;
+  }
   const day = parseInt(parts[0], 10);
   const monthStr = parts[1];
   const year = parseInt(parts[2], 10);
@@ -181,8 +190,46 @@ function parseDateString(dateStr) {
     jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
     jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11
   };
-  const month = months[monthStr.toLowerCase()] || 0;
+  const monthKey = monthStr.toLowerCase();
+  const month = Object.prototype.hasOwnProperty.call(months, monthKey)
+    ? months[monthKey]
+    : 0;
   return new Date(year, month, day);
+}
+
+function normalizeStatus(value, fallback) {
+  const status = String(value || "").trim();
+  return status === "Completed" || status === "Pending" ? status : (fallback || "Pending");
+}
+
+function normalizeDateKey(value) {
+  if (!value) return "";
+
+  const timezone = Session.getScriptTimeZone();
+  if (Object.prototype.toString.call(value) === "[object Date]" && !isNaN(value)) {
+    return Utilities.formatDate(value, timezone, "yyyy-MM-dd");
+  }
+
+  const text = String(value).trim();
+  if (!text) return "";
+
+  const parsed = new Date(text);
+  if (!isNaN(parsed)) {
+    return Utilities.formatDate(parsed, timezone, "yyyy-MM-dd");
+  }
+
+  const dateMatch = text.replace(/-/g, " ").match(/^(\d{1,2})\s+([A-Za-z]{3,})\s+(\d{4})$/);
+  if (!dateMatch) return text;
+
+  const months = {
+    jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+    jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
+  };
+  const day = String(parseInt(dateMatch[1], 10)).padStart(2, "0");
+  const month = months[dateMatch[2].substring(0, 3).toLowerCase()];
+  const year = dateMatch[3];
+
+  return month ? `${year}-${String(month).padStart(2, "0")}-${day}` : text;
 }
 
 /* =========================================
@@ -201,7 +248,7 @@ function getDashboardStats() {
   if (trackerData.length > 1) {
     totalTasks = trackerData.length - 1;
     for (let i = 1; i < trackerData.length; i++) {
-      const status = trackerData[i][10]; // Column K
+      const status = normalizeStatus(trackerData[i][6]); // Column G
       if (status === "Completed") {
         completedTasks++;
       } else {
@@ -211,7 +258,7 @@ function getDashboardStats() {
   }
   
   // Notes Stats
-  const notesSheet = ss.getSheetByName("Notes");
+  const notesSheet = ss.getSheetByName(NOTES_SHEET);
   const notesData = notesSheet ? notesSheet.getDataRange().getValues() : [];
   let totalNotes = 0;
   let activeNotes = 0;
@@ -226,7 +273,7 @@ function getDashboardStats() {
   }
   
   // TodoList Stats
-  const todoSheet = ss.getSheetByName("TodoList");
+  const todoSheet = ss.getSheetByName(TODO_SHEET);
   const todoData = todoSheet ? todoSheet.getDataRange().getValues() : [];
   let totalTodos = 0;
   let pendingTodos = 0;
@@ -264,6 +311,7 @@ function saveStandup(data) {
   const id = getNextId(sheet);
   const status = data.status || "Pending";
   const comments = data.comments || "";
+  const timestamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd-MMM-yyyy HH:mm:ss");
 
   sheet.appendRow([
     id,
@@ -272,11 +320,11 @@ function saveStandup(data) {
     data.completedTasks,
     data.inProgressTasks,
     data.deliverables,
-    data.blockers,
-    data.clarifications,
-    new Date(),
+    status,
+    data.blockers || "-",
+    data.clarifications || "-",
     comments,
-    status
+    timestamp
   ]);
 
   return {
@@ -301,11 +349,11 @@ function getAllTasks() {
       completedTasks: row[3],
       inProgressTasks: row[4],
       deliverables: row[5],
-      blockers: row[6],
-      clarifications: row[7],
-      timestamp: row[8],
+      status: normalizeStatus(row[6]),
+      blockers: row[7],
+      clarifications: row[8],
       comments: row[9] || "",
-      status: row[10] || "Pending"
+      timestamp: row[10] || ""
     });
   }
   
@@ -326,8 +374,8 @@ function updateTask(data) {
   if (rowNum === -1) {
     return { success: false, message: "Task not found." };
   }
-  sheet.getRange(rowNum, 10).setValue(data.comments || ""); // Column J is cell 10
-  sheet.getRange(rowNum, 11).setValue(data.status || "Pending"); // Column K is cell 11
+  sheet.getRange(rowNum, 7).setValue(data.status || "Pending"); // Column G
+  sheet.getRange(rowNum, 10).setValue(data.comments || ""); // Column J
   return { success: true, message: "Task updated." };
 }
 
@@ -347,7 +395,7 @@ function markTaskCompleted(data) {
   if (rowNum === -1) {
     return { success: false, message: "Task not found." };
   }
-  sheet.getRange(rowNum, 11).setValue("Completed");
+  sheet.getRange(rowNum, 7).setValue("Completed"); // Column G
   return { success: true, message: "Task marked completed." };
 }
 
@@ -394,7 +442,7 @@ function addDeveloper(data) {
 function getTodaySummary() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(TRACKER_SHEET);
   const rows = sheet.getDataRange().getValues();
-  const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd-MMM-yyyy");
+  const today = normalizeDateKey(new Date());
 
   let developers = [];
   let completed = [];
@@ -405,17 +453,17 @@ function getTodaySummary() {
 
   for (let i = 1; i < rows.length; i++) {
     const row = rows[i];
-    if (row[1] === today) {
+    if (normalizeDateKey(row[1]) === today) {
       developers.push(row[2]);
       completed.push(`${row[2]} : ${row[3]}`);
       inProgress.push(`${row[2]} : ${row[4]}`);
       deliverables.push(`${row[2]} : ${row[5]}`);
 
-      if (row[6] && row[6] !== "-") {
-        blockers.push(`${row[2]} : ${row[6]}`);
-      }
       if (row[7] && row[7] !== "-") {
-        clarifications.push(`${row[2]} : ${row[7]}`);
+        blockers.push(`${row[2]} : ${row[7]}`);
+      }
+      if (row[8] && row[8] !== "-") {
+        clarifications.push(`${row[2]} : ${row[8]}`);
       }
     }
   }
@@ -436,7 +484,7 @@ function getTodaySummary() {
 ========================================= */
 
 function getNotes() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Notes");
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(NOTES_SHEET);
   if (!sheet) return [];
   const rows = sheet.getDataRange().getValues();
   if (rows.length <= 1) return [];
@@ -458,7 +506,7 @@ function getNotes() {
 }
 
 function addNote(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Notes");
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(NOTES_SHEET);
   const id = getNextId(sheet);
   const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd-MMM-yyyy");
   
@@ -475,7 +523,7 @@ function addNote(data) {
 }
 
 function updateNote(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Notes");
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(NOTES_SHEET);
   const rowNum = findRowById(sheet, data.id);
   if (rowNum === -1) {
     return { success: false, message: "Note not found." };
@@ -486,7 +534,7 @@ function updateNote(data) {
 }
 
 function deleteNote(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Notes");
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(NOTES_SHEET);
   const rowNum = findRowById(sheet, data.id);
   if (rowNum === -1) {
     return { success: false, message: "Note not found." };
@@ -496,7 +544,7 @@ function deleteNote(data) {
 }
 
 function markNoteCompleted(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Notes");
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(NOTES_SHEET);
   const rowNum = findRowById(sheet, data.id);
   if (rowNum === -1) {
     return { success: false, message: "Note not found." };
@@ -510,7 +558,7 @@ function markNoteCompleted(data) {
 ========================================= */
 
 function getTodos() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TodoList");
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(TODO_SHEET);
   if (!sheet) return [];
   const rows = sheet.getDataRange().getValues();
   if (rows.length <= 1) return [];
@@ -535,7 +583,7 @@ function getTodos() {
 }
 
 function addTodo(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TodoList");
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(TODO_SHEET);
   const id = getNextId(sheet);
   const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd-MMM-yyyy");
   
@@ -555,7 +603,7 @@ function addTodo(data) {
 }
 
 function updateTodo(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TodoList");
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(TODO_SHEET);
   const rowNum = findRowById(sheet, data.id);
   if (rowNum === -1) {
     return { success: false, message: "Todo not found." };
@@ -569,7 +617,7 @@ function updateTodo(data) {
 }
 
 function deleteTodo(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TodoList");
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(TODO_SHEET);
   const rowNum = findRowById(sheet, data.id);
   if (rowNum === -1) {
     return { success: false, message: "Todo not found." };
@@ -579,7 +627,7 @@ function deleteTodo(data) {
 }
 
 function markTodoCompleted(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("TodoList");
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(TODO_SHEET);
   const rowNum = findRowById(sheet, data.id);
   if (rowNum === -1) {
     return { success: false, message: "Todo not found." };

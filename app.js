@@ -4,29 +4,29 @@
 // ==========================================
 
 const API_URL =
-    "https://script.google.com/macros/s/AKfycbxnVUj9t2G1eSP24srAA5O3jB5Df5O9ayQupu7BY2HgnJ-qiD4NTNdaOwfQty06jf_c/exec";
+  "https://script.google.com/macros/s/AKfycbzGP-t9Cnrpez16zgBnrsqu2eM4UNkk8wx9CwOmEIcaw9tyhrav1N-nyVIfZEfeD07c/exec";
 
 // ==========================================
 // SECTION: STATE
 // ==========================================
 
 const STATE = {
-  totalTasks:     0,
-  pendingTasks:   0,
+  totalTasks: 0,
+  pendingTasks: 0,
   completedTasks: 0,
-  totalNotes:     0,
-  activeNotes:    0,
-  totalTodos:     0,
-  pendingTodos:   0,
+  totalNotes: 0,
+  activeNotes: 0,
+  totalTodos: 0,
+  pendingTodos: 0,
   completedTodos: 0,
-  allTasks:       [],
-  allNotes:       [],
-  allTodos:       [],
+  allTasks: [],
+  allNotes: [],
+  allTodos: [],
   taskFilter: { search: "", status: "All", date: "All" },
   activeNotesTab: "notes",  // "notes" or "todos"
-  editingTaskId:  null,
-  editingNoteId:  null,
-  editingTodoId:  null
+  editingTaskId: null,
+  editingNoteId: null,
+  editingTodoId: null
 };
 
 // ==========================================
@@ -72,27 +72,27 @@ const generateDirectorSummaryBtn = document.getElementById("generateDirectorSumm
 // ==========================================
 
 document.addEventListener("DOMContentLoaded", async () => {
-    setCurrentDate();
-    loadTheme();
-    loadDevelopers();
-    initNav();
-    initModals();
-    
-    // Initial fetch of stats and data
-    showLoader("Loading standup portal...");
-    try {
-      await refreshStats();
-      await refreshNotesData();
-      await refreshTodosData();
-      
-      // Load initial dashboard stats
-      await initDashboard();
-    } catch (err) {
-      console.error(err);
-      showToast("Initial load failed. Check API URL.", "error");
-    } finally {
-      hideLoader();
-    }
+  setCurrentDate();
+  loadTheme();
+  loadDevelopers();
+  initNav();
+  initModals();
+
+  // Initial fetch of stats and data
+  showLoader("Loading standup portal...");
+  try {
+    await refreshStats();
+    await refreshNotesData();
+    await refreshTodosData();
+
+    // Load initial dashboard stats
+    await initDashboard();
+  } catch (err) {
+    console.error(err);
+    showToast("Initial load failed. Check API URL.", "error");
+  } finally {
+    hideLoader();
+  }
 });
 
 // ==========================================
@@ -108,7 +108,7 @@ async function api(action, body = null) {
     ? { method: "POST", body: JSON.stringify({ action, ...body }) }
     : { method: "GET" };
 
-  const res  = await fetch(url, options);
+  const res = await fetch(url, options);
   const data = await res.json();
   return data;
 }
@@ -135,19 +135,19 @@ async function initDashboard() {
   try {
     const stats = await api("getDashboardStats");
     if (stats && typeof stats === "object" && stats.success !== false) {
-      STATE.totalTasks     = stats.totalTasks || 0;
-      STATE.pendingTasks   = stats.pendingTasks || 0;
+      STATE.totalTasks = stats.totalTasks || 0;
+      STATE.pendingTasks = stats.pendingTasks || 0;
       STATE.completedTasks = stats.completedTasks || 0;
-      STATE.activeNotes    = stats.activeNotes || 0;
-      STATE.pendingTodos   = stats.pendingTodos || 0;
+      STATE.activeNotes = stats.activeNotes || 0;
+      STATE.pendingTodos = stats.pendingTodos || 0;
       STATE.completedTodos = stats.completedTodos || 0;
     } else {
       console.warn("getDashboardStats returned unexpected result:", stats);
     }
-    
+
     renderDashboardStats();
     updateStatDisplay();
-    
+
     renderStickyNotesPreview();
     renderTodoPreview();
   } catch (err) {
@@ -159,7 +159,7 @@ async function initDashboard() {
 function renderDashboardStats() {
   const container = document.getElementById("dashboardStats");
   if (!container) return;
-  
+
   const stats = [
     { label: "Total Tasks", val: STATE.totalTasks, icon: "📋", dot: "dot-blue", id: "statTotalTasksVal" },
     { label: "Pending Tasks", val: STATE.pendingTasks, icon: "⏳", dot: "dot-amber", id: "statPendingTasksVal" },
@@ -168,7 +168,7 @@ function renderDashboardStats() {
     { label: "Pending To-Dos", val: STATE.pendingTodos, icon: "⏰", dot: "dot-red", id: "statPendingTodosVal" },
     { label: "Completed To-Dos", val: STATE.completedTodos, icon: "✔️", dot: "dot-green", id: "statCompletedTodosVal" }
   ];
-  
+
   container.innerHTML = stats.map(s => `
     <div class="stat-card">
       <div class="stat-card-icon" style="background: var(--surface-3);">
@@ -186,9 +186,9 @@ function renderDashboardStats() {
 function renderStickyNotesPreview() {
   const container = document.getElementById("notesPreview");
   if (!container) return;
-  
+
   const activeNotes = STATE.allNotes.filter(n => n.status === "Active").slice(0, 6);
-  
+
   if (activeNotes.length === 0) {
     container.innerHTML = `
       <div class="empty-state" style="width: 100%;">
@@ -197,7 +197,7 @@ function renderStickyNotesPreview() {
     `;
     return;
   }
-  
+
   container.innerHTML = activeNotes.map(n => {
     const contentTrunc = n.content.length > 90 ? n.content.substring(0, 87) + "..." : n.content;
     return `
@@ -214,7 +214,7 @@ function renderStickyNotesPreview() {
       </div>
     `;
   }).join("");
-  
+
   // Bind events
   container.querySelectorAll(".mark-note-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -233,7 +233,7 @@ function renderStickyNotesPreview() {
 function renderTodoPreview() {
   const container = document.getElementById("todosPreview");
   if (!container) return;
-  
+
   if (STATE.allTodos.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
@@ -242,34 +242,34 @@ function renderTodoPreview() {
     `;
     return;
   }
-  
+
   // Sort: Pending first, then Completed
   const sortedTodos = [...STATE.allTodos].sort((a, b) => {
     if (a.status === "Pending" && b.status === "Completed") return -1;
     if (a.status === "Completed" && b.status === "Pending") return 1;
     return b.id - a.id;
   });
-  
+
   container.innerHTML = sortedTodos.map(todo => {
     const isCompleted = todo.status === "Completed";
     const itemClass = isCompleted ? "todo-item completed" : "todo-item";
     const priorityClass = `priority-${todo.priority.toLowerCase()}`;
-    
+
     const dueBadge = todo.dueDate ? `
       <span class="badge ${isOverdue(todo.dueDate) && !isCompleted ? 'overdue' : ''}" style="font-size: 11px;">
         📅 Due: ${formatDisplayDate(todo.dueDate)}
       </span>
     ` : "";
-    
+
     const statusBadge = `<span class="badge ${isCompleted ? 'badge-completed' : 'badge-pending'}">${todo.status}</span>`;
     const actionButtons = !isCompleted ? `
       <button class="btn btn-secondary btn-sm comp-todo-btn">✓ Complete</button>
     ` : "";
-    
+
     const descriptionHtml = todo.description ? `
       <p class="text-muted" style="margin-top: 4px; font-size: 12px;">${todo.description}</p>
     ` : "";
-    
+
     return `
       <div class="${itemClass}" data-id="${todo.id}">
         <div class="todo-item-left">
@@ -292,7 +292,7 @@ function renderTodoPreview() {
       </div>
     `;
   }).join("");
-  
+
   // Bind events
   container.querySelectorAll(".comp-todo-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -319,62 +319,62 @@ function renderTodoPreview() {
 // ==========================================
 
 function initNav() {
-    navItems.forEach(item => {
-        item.addEventListener("click", (e) => {
-            e.preventDefault();
-            const tab = item.dataset.tab;
-            switchTab(tab);
+  navItems.forEach(item => {
+    item.addEventListener("click", (e) => {
+      e.preventDefault();
+      const tab = item.dataset.tab;
+      switchTab(tab);
 
-            navItems.forEach(n => n.classList.remove("active"));
-            item.classList.add("active");
-        });
+      navItems.forEach(n => n.classList.remove("active"));
+      item.classList.add("active");
     });
+  });
 
-    // Sub-tabs switching logic (Notes vs To-Dos inside Notes tab)
-    const subTabs = document.querySelectorAll(".sub-tab");
-    subTabs.forEach(btn => {
-      btn.addEventListener("click", () => {
-        subTabs.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        
-        const subpage = btn.dataset.subtab;
-        document.querySelectorAll(".sub-page").forEach(sp => sp.classList.remove("active"));
-        document.getElementById(`subpage-${subpage}`).classList.add("active");
-        
-        if (subpage === "notes") {
-          renderNotes();
-        } else {
-          renderTodoList();
-        }
-      });
+  // Sub-tabs switching logic (Notes vs To-Dos inside Notes tab)
+  const subTabs = document.querySelectorAll(".sub-tab");
+  subTabs.forEach(btn => {
+    btn.addEventListener("click", () => {
+      subTabs.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      const subpage = btn.dataset.subtab;
+      document.querySelectorAll(".sub-page").forEach(sp => sp.classList.remove("active"));
+      document.getElementById(`subpage-${subpage}`).classList.add("active");
+
+      if (subpage === "notes") {
+        renderNotes();
+      } else {
+        renderTodoList();
+      }
     });
+  });
 }
 
 function switchTab(tab) {
-    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
 
-    const tabTitles = {
-        dashboard: "Dashboard",
-        standup: "Daily Update",
-        summary: "Director Summary",
-        tasks: "Task List",
-        notes: "Notes & To-Do"
-    };
+  const tabTitles = {
+    dashboard: "Dashboard",
+    standup: "Daily Update",
+    summary: "Director Summary",
+    tasks: "Task List",
+    notes: "Notes & To-Do"
+  };
 
-    const page = document.getElementById(`page-${tab}`);
-    if (page) {
-        page.classList.add("active");
-        pageTitle.textContent = tabTitles[tab] || "Dashboard";
-        
-        // Call appropriate tab refreshers
-        if (tab === "dashboard") {
-          initDashboard();
-        } else if (tab === "tasks") {
-          initTaskList();
-        } else if (tab === "notes") {
-          initNotes();
-        }
+  const page = document.getElementById(`page-${tab}`);
+  if (page) {
+    page.classList.add("active");
+    pageTitle.textContent = tabTitles[tab] || "Dashboard";
+
+    // Call appropriate tab refreshers
+    if (tab === "dashboard") {
+      initDashboard();
+    } else if (tab === "tasks") {
+      initTaskList();
+    } else if (tab === "notes") {
+      initNotes();
     }
+  }
 }
 
 // ==========================================
@@ -382,21 +382,21 @@ function switchTab(tab) {
 // ==========================================
 
 function loadTheme() {
-    const saved = localStorage.getItem("standup_theme") || "dark";
-    applyTheme(saved);
+  const saved = localStorage.getItem("standup_theme") || "dark";
+  applyTheme(saved);
 }
 
 function applyTheme(theme) {
-    document.body.setAttribute("data-theme", theme);
-    if (themeLabel) {
-        themeLabel.textContent = theme === "dark" ? "Dark" : "Light";
-    }
-    localStorage.setItem("standup_theme", theme);
+  document.body.setAttribute("data-theme", theme);
+  if (themeLabel) {
+    themeLabel.textContent = theme === "dark" ? "Dark" : "Light";
+  }
+  localStorage.setItem("standup_theme", theme);
 }
 
 themeToggle.addEventListener("click", () => {
-    const current = document.body.getAttribute("data-theme");
-    applyTheme(current === "dark" ? "light" : "dark");
+  const current = document.body.getAttribute("data-theme");
+  applyTheme(current === "dark" ? "light" : "dark");
 });
 
 // ==========================================
@@ -404,23 +404,23 @@ themeToggle.addEventListener("click", () => {
 // ==========================================
 
 function showLoader(msg = "Saving…") {
-    if (loaderText) loaderText.textContent = msg;
-    loader.classList.remove("hidden");
+  if (loaderText) loaderText.textContent = msg;
+  loader.classList.remove("hidden");
 }
 
 function hideLoader() {
-    loader.classList.add("hidden");
+  loader.classList.add("hidden");
 }
 
 let toastTimer = null;
 
 function showToast(message, type = "info") {
-    toast.textContent = message;
-    toast.className = `toast toast-${type} show`;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => {
-        toast.classList.remove("show");
-    }, 3200);
+  toast.textContent = message;
+  toast.className = `toast toast-${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3200);
 }
 
 // ==========================================
@@ -428,71 +428,71 @@ function showToast(message, type = "info") {
 // ==========================================
 
 function setCurrentDate() {
-    const today = new Date();
-    currentDateEl.textContent = today.toLocaleDateString("en-GB", {
-        weekday: "short",
-        day: "2-digit",
-        month: "short",
-        year: "numeric"
-    });
+  const today = new Date();
+  currentDateEl.textContent = today.toLocaleDateString("en-GB", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
 }
 
 function getFormattedDate() {
-    const today = new Date();
-    return today.toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric"
-    });
+  const today = new Date();
+  return today.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
 }
 
 async function loadDevelopers() {
-    try {
-        showLoader("Loading developers…");
-        const developers = await api("getDevelopers");
+  try {
+    showLoader("Loading developers…");
+    const developers = await api("getDevelopers");
 
-        developerDropdown.innerHTML =
-            '<option value="">Select developer…</option>';
+    developerDropdown.innerHTML =
+      '<option value="">Select developer…</option>';
 
-        if (Array.isArray(developers)) {
-            developers.forEach(dev => {
-                const opt = document.createElement("option");
-                opt.value = dev;
-                opt.textContent = dev;
-                developerDropdown.appendChild(opt);
-            });
-        } else {
-            console.warn("getDevelopers response is not an array:", developers);
-        }
-
-    } catch (err) {
-        console.error("loadDevelopers:", err);
-        showToast("Could not load developers. Check API URL.", "error");
-    } finally {
-        hideLoader();
+    if (Array.isArray(developers)) {
+      developers.forEach(dev => {
+        const opt = document.createElement("option");
+        opt.value = dev;
+        opt.textContent = dev;
+        developerDropdown.appendChild(opt);
+      });
+    } else {
+      console.warn("getDevelopers response is not an array:", developers);
     }
+
+  } catch (err) {
+    console.error("loadDevelopers:", err);
+    showToast("Could not load developers. Check API URL.", "error");
+  } finally {
+    hideLoader();
+  }
 }
 
 generateSummaryBtn.addEventListener("click", generateTeamsSummary);
 
 function generateTeamsSummary() {
-    const developer = developerDropdown.value;
-    const completed = document.getElementById("completedTasks").value.trim();
-    const inProgress = document.getElementById("inProgressTasks").value.trim();
-    const deliverables = document.getElementById("deliverables").value.trim();
-    const blockers = document.getElementById("blockers").value.trim();
-    const clarifications = document.getElementById("clarifications").value.trim();
-    const comments = document.getElementById("comments").value.trim();
+  const developer = developerDropdown.value;
+  const completed = document.getElementById("completedTasks").value.trim();
+  const inProgress = document.getElementById("inProgressTasks").value.trim();
+  const deliverables = document.getElementById("deliverables").value.trim();
+  const blockers = document.getElementById("blockers").value.trim();
+  const clarifications = document.getElementById("clarifications").value.trim();
+  const comments = document.getElementById("comments").value.trim();
 
-    if (!developer) {
-        showToast("Please select a developer first.", "error");
-        return;
-    }
+  if (!developer) {
+    showToast("Please select a developer first.", "error");
+    return;
+  }
 
-    const date = getFormattedDate();
+  const date = getFormattedDate();
 
-    let summary =
-        `📋 Daily Standup Update — ${date}
+  let summary =
+    `📋 Daily Standup Update — ${date}
 Developer: ${developer}
 
 ✅ Completed Tasks
@@ -510,77 +510,77 @@ ${blockers || "—"}
 ❓ Clarifications Required
 ${clarifications || "—"}`;
 
-    if (comments) {
-        summary += `\n\n💬 Comments / Updates\n${comments}`;
-    }
+  if (comments) {
+    summary += `\n\n💬 Comments / Updates\n${comments}`;
+  }
 
-    summaryOutput.textContent = summary;
+  summaryOutput.textContent = summary;
 }
 
 copySummaryBtn.addEventListener("click", async () => {
-    const text = summaryOutput.textContent.trim();
-    if (!text || summaryOutput.querySelector(".empty-state")) {
-        showToast("Nothing to copy yet.", "error");
-        return;
-    }
+  const text = summaryOutput.textContent.trim();
+  if (!text || summaryOutput.querySelector(".empty-state")) {
+    showToast("Nothing to copy yet.", "error");
+    return;
+  }
 
-    try {
-        await navigator.clipboard.writeText(text);
-        showToast("Summary copied to clipboard.", "success");
-    } catch {
-        showToast("Copy failed — try selecting and copying manually.", "error");
-    }
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast("Summary copied to clipboard.", "success");
+  } catch {
+    showToast("Copy failed — try selecting and copying manually.", "error");
+  }
 });
 
 standupForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const developer = developerDropdown.value;
-    if (!developer) {
-        showToast("Please select a developer.", "error");
-        return;
+  const developer = developerDropdown.value;
+  if (!developer) {
+    showToast("Please select a developer.", "error");
+    return;
+  }
+
+  const payload = {
+    date: getFormattedDate(),
+    developer: developer,
+    completedTasks: document.getElementById("completedTasks").value.trim(),
+    inProgressTasks: document.getElementById("inProgressTasks").value.trim(),
+    deliverables: document.getElementById("deliverables").value.trim(),
+    blockers: document.getElementById("blockers").value.trim(),
+    clarifications: document.getElementById("clarifications").value.trim(),
+    comments: document.getElementById("comments").value.trim(),
+    status: "Pending"
+  };
+
+  try {
+    showLoader("Saving standup…");
+    const result = await api("saveStandup", payload);
+
+    if (result.success) {
+      showToast("Standup saved successfully!", "success");
+      generateTeamsSummary();
+      await refreshStats();
+      resetForm();
+    } else {
+      showToast("Save failed: " + (result.message || "Unknown error"), "error");
     }
 
-    const payload = {
-        date: getFormattedDate(),
-        developer: developer,
-        completedTasks: document.getElementById("completedTasks").value.trim(),
-        inProgressTasks: document.getElementById("inProgressTasks").value.trim(),
-        deliverables: document.getElementById("deliverables").value.trim(),
-        blockers: document.getElementById("blockers").value.trim(),
-        clarifications: document.getElementById("clarifications").value.trim(),
-        comments: document.getElementById("comments").value.trim(),
-        status: "Pending"
-    };
-
-    try {
-        showLoader("Saving standup…");
-        const result = await api("saveStandup", payload);
-
-        if (result.success) {
-            showToast("Standup saved successfully!", "success");
-            generateTeamsSummary();
-            await refreshStats();
-            resetForm();
-        } else {
-            showToast("Save failed: " + (result.message || "Unknown error"), "error");
-        }
-
-    } catch (err) {
-        console.error("saveStandup:", err);
-        showToast("Network error. Check your connection.", "error");
-    } finally {
-        hideLoader();
-    }
+  } catch (err) {
+    console.error("saveStandup:", err);
+    showToast("Network error. Check your connection.", "error");
+  } finally {
+    hideLoader();
+  }
 });
 
 function resetForm() {
-    document.getElementById("completedTasks").value = "";
-    document.getElementById("inProgressTasks").value = "";
-    document.getElementById("deliverables").value = "";
-    document.getElementById("blockers").value = "";
-    document.getElementById("clarifications").value = "";
-    document.getElementById("comments").value = "";
+  document.getElementById("completedTasks").value = "";
+  document.getElementById("inProgressTasks").value = "";
+  document.getElementById("deliverables").value = "";
+  document.getElementById("blockers").value = "";
+  document.getElementById("clarifications").value = "";
+  document.getElementById("comments").value = "";
 }
 
 // ==========================================
@@ -608,7 +608,7 @@ async function initTaskList() {
 function showTaskSkeletons() {
   const container = document.getElementById("taskListContainer");
   if (!container) return;
-  
+
   container.innerHTML = Array(4).fill(0).map(() => `
     <div class="skeleton-card">
       <div class="skeleton-bar title skeleton"></div>
@@ -623,7 +623,7 @@ function showTaskSkeletons() {
 function renderTaskList(tasks) {
   const container = document.getElementById("taskListContainer");
   if (!container) return;
-  
+
   if (tasks.length === 0) {
     container.innerHTML = `
       <div class="empty-state-full">
@@ -636,7 +636,7 @@ function renderTaskList(tasks) {
     `;
     return;
   }
-  
+
   // Group by DATE
   const groups = {};
   tasks.forEach(t => {
@@ -645,12 +645,12 @@ function renderTaskList(tasks) {
     }
     groups[t.date].push(t);
   });
-  
+
   // Sort date groups descending
   const sortedDates = Object.keys(groups).sort((a, b) => {
     return parseDateString(b) - parseDateString(a);
   });
-  
+
   let html = "";
   sortedDates.forEach(date => {
     html += `
@@ -659,36 +659,36 @@ function renderTaskList(tasks) {
           <span>📅 ${date}</span>
         </div>
     `;
-    
+
     // Sort developers alphabetically
     const dateTasks = groups[date].sort((a, b) => a.developer.localeCompare(b.developer));
-    
+
     dateTasks.forEach(t => {
       const isCompleted = t.status === "Completed";
       const statusClass = isCompleted ? "status-completed" : "status-pending";
       const cardClass = isCompleted ? "task-card completed" : "task-card";
-      
+
       const blockersHtml = (t.blockers && t.blockers !== "-") ? `
         <div class="task-field">
           <span class="task-field-label">🚫 Blockers:</span>
           <span class="task-field-value">${t.blockers}</span>
         </div>
       ` : "";
-      
+
       const clarificationsHtml = (t.clarifications && t.clarifications !== "-") ? `
         <div class="task-field">
           <span class="task-field-label">❓ Clarifications:</span>
           <span class="task-field-value">${t.clarifications}</span>
         </div>
       ` : "";
-      
+
       const commentsHtml = `
         <div class="task-comments">
           <div class="task-comments-label">💬 Comments / Updates:</div>
           <p class="text-muted" style="font-size: 13px;">${t.comments || "No comments yet."}</p>
         </div>
       `;
-      
+
       html += `
         <div class="${cardClass}" data-id="${t.id}" style="${isCompleted ? 'border-left-color: var(--task-completed-border)' : 'border-left-color: var(--task-pending-border)'}">
           <div class="task-card-header">
@@ -726,12 +726,12 @@ function renderTaskList(tasks) {
         </div>
       `;
     });
-    
+
     html += `</div>`;
   });
-  
+
   container.innerHTML = html;
-  
+
   // Attach Event Listeners
   container.querySelectorAll(".mark-task-comp-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -740,7 +740,7 @@ function renderTaskList(tasks) {
       handleMarkTaskCompleted(id);
     });
   });
-  
+
   container.querySelectorAll(".edit-task-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const card = btn.closest(".task-card");
@@ -748,7 +748,7 @@ function renderTaskList(tasks) {
       handleEditTask(id);
     });
   });
-  
+
   container.querySelectorAll(".delete-task-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const card = btn.closest(".task-card");
@@ -760,21 +760,21 @@ function renderTaskList(tasks) {
 
 function applyTaskFilters() {
   let filtered = [...STATE.allTasks];
-  
+
   if (STATE.taskFilter.status !== "All") {
     filtered = filtered.filter(t => t.status === STATE.taskFilter.status);
   }
-  
+
   if (STATE.taskFilter.date === "Today") {
     const todayStr = getFormattedDate();
     filtered = filtered.filter(t => t.date === todayStr);
   } else if (STATE.taskFilter.date === "Week") {
     filtered = filtered.filter(t => isWithinThisWeek(t.date));
   }
-  
+
   if (STATE.taskFilter.search) {
     const q = STATE.taskFilter.search.toLowerCase();
-    filtered = filtered.filter(t => 
+    filtered = filtered.filter(t =>
       t.developer.toLowerCase().includes(q) ||
       t.completedTasks.toLowerCase().includes(q) ||
       t.inProgressTasks.toLowerCase().includes(q) ||
@@ -784,7 +784,7 @@ function applyTaskFilters() {
       t.comments.toLowerCase().includes(q)
     );
   }
-  
+
   renderTaskList(filtered);
 }
 
@@ -810,11 +810,11 @@ async function handleMarkTaskCompleted(id) {
 function handleEditTask(id) {
   const task = STATE.allTasks.find(t => t.id === id);
   if (!task) return;
-  
+
   document.getElementById("editTaskInfo").textContent = `Developer: ${task.developer} | Date: ${task.date}`;
   document.getElementById("editTaskComments").value = task.comments || "";
   document.getElementById("editTaskStatus").value = task.status || "Pending";
-  
+
   STATE.editingTaskId = id;
   document.getElementById("editTaskModal").classList.add("active");
   document.getElementById("editTaskComments").focus();
@@ -824,7 +824,7 @@ async function saveTaskChanges() {
   const comments = document.getElementById("editTaskComments").value.trim();
   const status = document.getElementById("editTaskStatus").value;
   const id = STATE.editingTaskId;
-  
+
   try {
     showLoader("Saving task changes...");
     const result = await api("updateTask", { id: id, comments: comments, status: status });
@@ -901,7 +901,7 @@ async function refreshNotesData() {
 function renderNotes() {
   const container = document.getElementById("notesGrid");
   if (!container) return;
-  
+
   if (STATE.allNotes.length === 0) {
     container.innerHTML = `
       <div class="empty-state-full" style="grid-column: 1 / -1;">
@@ -910,24 +910,24 @@ function renderNotes() {
     `;
     return;
   }
-  
+
   // Sort Active first, then Completed.
   const sortedNotes = [...STATE.allNotes].sort((a, b) => {
     if (a.status === "Active" && b.status === "Completed") return -1;
     if (a.status === "Completed" && b.status === "Active") return 1;
     return b.id - a.id;
   });
-  
+
   container.innerHTML = sortedNotes.map(n => {
     const isCompleted = n.status === "Completed";
     const cardClass = isCompleted ? "note-card completed" : "note-card";
     const statusBadge = `<span class="badge ${isCompleted ? 'badge-completed' : 'badge-active'}">${n.status}</span>`;
-    
+
     const actionButtons = !isCompleted ? `
       <button class="btn-icon mark-note-btn" title="Mark Done">✓</button>
       <button class="btn-icon edit-note-btn" title="Edit">✏</button>
     ` : "";
-    
+
     return `
       <div class="${cardClass}" data-id="${n.id}">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
@@ -945,7 +945,7 @@ function renderNotes() {
       </div>
     `;
   }).join("");
-  
+
   // Bind events
   container.querySelectorAll(".mark-note-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -989,12 +989,12 @@ async function handleMarkNoteCompleted(id) {
 async function handleAddNote() {
   const title = document.getElementById("newNoteTitle").value.trim();
   const content = document.getElementById("newNoteContent").value.trim();
-  
+
   if (!title || !content) {
     showToast("Please fill in all required fields.", "error");
     return;
   }
-  
+
   try {
     showLoader("Adding note...");
     const result = await api("addNote", { title: title, content: content });
@@ -1017,11 +1017,11 @@ async function handleAddNote() {
 function handleEditNote(id) {
   const note = STATE.allNotes.find(n => n.id === id);
   if (!note) return;
-  
+
   document.getElementById("editNoteTitle").value = note.title;
   document.getElementById("editNoteContent").value = note.content;
   STATE.editingNoteId = id;
-  
+
   document.getElementById("editNoteModal").classList.add("active");
   document.getElementById("editNoteTitle").focus();
 }
@@ -1030,12 +1030,12 @@ async function handleUpdateNote() {
   const title = document.getElementById("editNoteTitle").value.trim();
   const content = document.getElementById("editNoteContent").value.trim();
   const id = STATE.editingNoteId;
-  
+
   if (!title || !content) {
     showToast("Please fill in all required fields.", "error");
     return;
   }
-  
+
   try {
     showLoader("Updating note...");
     const result = await api("updateNote", { id: id, title: title, content: content });
@@ -1099,7 +1099,7 @@ async function refreshTodosData() {
 function renderTodoList() {
   const container = document.getElementById("todoList");
   if (!container) return;
-  
+
   if (STATE.allTodos.length === 0) {
     container.innerHTML = `
       <div class="empty-state-full">
@@ -1108,33 +1108,33 @@ function renderTodoList() {
     `;
     return;
   }
-  
+
   const sortedTodos = [...STATE.allTodos].sort((a, b) => {
     if (a.status === "Pending" && b.status === "Completed") return -1;
     if (a.status === "Completed" && b.status === "Pending") return 1;
     return b.id - a.id;
   });
-  
+
   container.innerHTML = sortedTodos.map(todo => {
     const isCompleted = todo.status === "Completed";
     const itemClass = isCompleted ? "todo-item completed" : "todo-item";
     const priorityClass = `priority-${todo.priority.toLowerCase()}`;
-    
+
     const dueBadge = todo.dueDate ? `
       <span class="badge ${isOverdue(todo.dueDate) && !isCompleted ? 'overdue' : ''}" style="font-size: 11px;">
         📅 Due: ${formatDisplayDate(todo.dueDate)}
       </span>
     ` : "";
-    
+
     const statusBadge = `<span class="badge ${isCompleted ? 'badge-completed' : 'badge-pending'}">${todo.status}</span>`;
     const actionButtons = !isCompleted ? `
       <button class="btn btn-secondary btn-sm comp-todo-btn">✓ Complete</button>
     ` : "";
-    
+
     const descriptionHtml = todo.description ? `
       <p class="text-muted" style="margin-top: 4px; font-size: 12px;">${todo.description}</p>
     ` : "";
-    
+
     return `
       <div class="${itemClass}" data-id="${todo.id}">
         <div class="todo-item-left">
@@ -1157,7 +1157,7 @@ function renderTodoList() {
       </div>
     `;
   }).join("");
-  
+
   // Bind events
   container.querySelectorAll(".comp-todo-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -1204,12 +1204,12 @@ async function handleAddTodo() {
   const assignedBy = document.getElementById("newTodoAssignedBy").value.trim();
   const priority = document.getElementById("newTodoPriority").value;
   const dueDate = document.getElementById("newTodoDueDate").value;
-  
+
   if (!title) {
     showToast("Title is required.", "error");
     return;
   }
-  
+
   try {
     showLoader("Adding todo...");
     const result = await api("addTodo", {
@@ -1238,12 +1238,12 @@ async function handleAddTodo() {
 function handleEditTodo(id) {
   const todo = STATE.allTodos.find(t => t.id === id);
   if (!todo) return;
-  
+
   document.getElementById("editTodoTitle").value = todo.title;
   document.getElementById("editTodoDesc").value = todo.description || "";
   document.getElementById("editTodoAssignedBy").value = todo.assignedBy || "";
   document.getElementById("editTodoPriority").value = todo.priority || "Medium";
-  
+
   if (todo.dueDate) {
     const parsed = new Date(todo.dueDate);
     if (!isNaN(parsed)) {
@@ -1257,7 +1257,7 @@ function handleEditTodo(id) {
   } else {
     document.getElementById("editTodoDueDate").value = "";
   }
-  
+
   STATE.editingTodoId = id;
   document.getElementById("editTodoModal").classList.add("active");
   document.getElementById("editTodoTitle").focus();
@@ -1270,12 +1270,12 @@ async function handleUpdateTodo() {
   const priority = document.getElementById("editTodoPriority").value;
   const dueDate = document.getElementById("editTodoDueDate").value;
   const id = STATE.editingTodoId;
-  
+
   if (!title) {
     showToast("Title is required.", "error");
     return;
   }
-  
+
   try {
     showLoader("Updating todo...");
     const result = await api("updateTodo", {
@@ -1329,11 +1329,11 @@ function handleDeleteTodo(id) {
 function initModals() {
   // Developer modal
   openDeveloperModal.addEventListener("click", () => {
-      developerModal.classList.add("active");
-      newDeveloperName.focus();
+    developerModal.classList.add("active");
+    newDeveloperName.focus();
   });
   document.getElementById("closeDeveloperModal").addEventListener("click", () => developerModal.classList.remove("active"));
-  
+
   // Close modals when clicking overlay
   document.querySelectorAll(".modal-overlay").forEach(overlay => {
     overlay.addEventListener("click", (e) => {
@@ -1342,7 +1342,7 @@ function initModals() {
       }
     });
   });
-  
+
   // ESC key to close all modals
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
@@ -1351,14 +1351,14 @@ function initModals() {
       });
     }
   });
-  
+
   // Close buttons on other modals
   document.querySelectorAll(".close-modal-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       btn.closest(".modal-overlay").classList.remove("active");
     });
   });
-  
+
   // Confirm modal close/cancel
   document.getElementById("closeConfirmModal").addEventListener("click", () => {
     document.getElementById("confirmModal").classList.remove("active");
@@ -1366,14 +1366,14 @@ function initModals() {
   document.getElementById("cancelConfirm").addEventListener("click", () => {
     document.getElementById("confirmModal").classList.remove("active");
   });
-  
+
   // Bind save buttons inside modals
   document.getElementById("saveTaskBtn").addEventListener("click", saveTaskChanges);
   document.getElementById("saveNoteBtn").addEventListener("click", handleAddNote);
   document.getElementById("updateNoteBtn").addEventListener("click", handleUpdateNote);
   document.getElementById("saveTodoBtn").addEventListener("click", handleAddTodo);
   document.getElementById("updateTodoBtn").addEventListener("click", handleUpdateTodo);
-  
+
   // Bind add button triggers
   document.getElementById("addNoteBtn").addEventListener("click", () => {
     document.getElementById("newNoteTitle").value = "";
@@ -1438,7 +1438,7 @@ function initModals() {
 }
 
 function showConfirm(title, message, onConfirm) {
-  document.getElementById("confirmTitle").textContent   = title;
+  document.getElementById("confirmTitle").textContent = title;
   document.getElementById("confirmMessage").textContent = message;
   document.getElementById("confirmModal").classList.add("active");
   document.getElementById("proceedConfirm").onclick = () => {
@@ -1454,11 +1454,11 @@ function showConfirm(title, message, onConfirm) {
 async function refreshStats() {
   try {
     const stats = await api("getDashboardStats");
-    STATE.totalTasks     = stats.totalTasks;
-    STATE.pendingTasks   = stats.pendingTasks;
+    STATE.totalTasks = stats.totalTasks;
+    STATE.pendingTasks = stats.pendingTasks;
     STATE.completedTasks = stats.completedTasks;
-    STATE.activeNotes    = stats.activeNotes;
-    STATE.pendingTodos   = stats.pendingTodos;
+    STATE.activeNotes = stats.activeNotes;
+    STATE.pendingTodos = stats.pendingTodos;
     STATE.completedTodos = stats.completedTodos;
     updateStatDisplay();
   } catch (err) {
@@ -1473,19 +1473,19 @@ function updateStatDisplay() {
 
   const totalTasksVal = document.getElementById("statTotalTasksVal");
   if (totalTasksVal) totalTasksVal.textContent = STATE.totalTasks;
-  
+
   const pendingTasksVal = document.getElementById("statPendingTasksVal");
   if (pendingTasksVal) pendingTasksVal.textContent = STATE.pendingTasks;
-  
+
   const completedTasksVal = document.getElementById("statCompletedTasksVal");
   if (completedTasksVal) completedTasksVal.textContent = STATE.completedTasks;
-  
+
   const activeNotesVal = document.getElementById("statActiveNotesVal");
   if (activeNotesVal) activeNotesVal.textContent = STATE.activeNotes;
-  
+
   const pendingTodosVal = document.getElementById("statPendingTodosVal");
   if (pendingTodosVal) pendingTodosVal.textContent = STATE.pendingTodos;
-  
+
   const completedTodosVal = document.getElementById("statCompletedTodosVal");
   if (completedTodosVal) completedTodosVal.textContent = STATE.completedTodos;
 }
@@ -1508,8 +1508,8 @@ function parseDateString(dateStr) {
 function isWithinThisWeek(dateStr) {
   const parsed = parseDateString(dateStr);
   const today = new Date();
-  today.setHours(0,0,0,0);
-  
+  today.setHours(0, 0, 0, 0);
+
   const timeDiff = today.getTime() - parsed.getTime();
   const diffDays = timeDiff / (1000 * 3600 * 24);
   return diffDays >= 0 && diffDays <= 7;
@@ -1518,9 +1518,9 @@ function isWithinThisWeek(dateStr) {
 function isOverdue(dueDateStr) {
   if (!dueDateStr) return false;
   const due = new Date(dueDateStr);
-  due.setHours(0,0,0,0);
+  due.setHours(0, 0, 0, 0);
   const today = new Date();
-  today.setHours(0,0,0,0);
+  today.setHours(0, 0, 0, 0);
   return due < today;
 }
 
@@ -1539,13 +1539,13 @@ if (generateDirectorSummaryBtn) {
 }
 
 async function generateDirectorSummary() {
-    try {
-        showLoader("Generating report…");
-        const data = await api("getTodaySummary");
-        const date = getFormattedDate();
+  try {
+    showLoader("Generating report…");
+    const data = await api("getTodaySummary");
+    const date = getFormattedDate();
 
-        const report =
-            `📊 Director's Daily Standup Report
+    const report =
+      `📊 Director's Daily Standup Report
 Date: ${date}
 Developers Updated: ${data.totalDevelopers}
 
@@ -1574,28 +1574,28 @@ ${"─".repeat(48)}
 ❓  CLARIFICATIONS REQUIRED
 ${data.clarifications || "None reported."}`;
 
-        directorSummaryOutput.textContent = report;
+    directorSummaryOutput.textContent = report;
 
-    } catch (err) {
-        console.error("generateDirectorSummary:", err);
-        showToast("Failed to generate report.", "error");
-    } finally {
-        hideLoader();
-    }
+  } catch (err) {
+    console.error("generateDirectorSummary:", err);
+    showToast("Failed to generate report.", "error");
+  } finally {
+    hideLoader();
+  }
 }
 
 if (copyDirectorBtn) {
-    copyDirectorBtn.addEventListener("click", async () => {
-        const text = directorSummaryOutput.textContent.trim();
-        if (!text || directorSummaryOutput.querySelector(".empty-state")) {
-            showToast("Generate a report first.", "error");
-            return;
-        }
-        try {
-            await navigator.clipboard.writeText(text);
-            showToast("Report copied to clipboard.", "success");
-        } catch {
-            showToast("Copy failed.", "error");
-        }
-    });
+  copyDirectorBtn.addEventListener("click", async () => {
+    const text = directorSummaryOutput.textContent.trim();
+    if (!text || directorSummaryOutput.querySelector(".empty-state")) {
+      showToast("Generate a report first.", "error");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("Report copied to clipboard.", "success");
+    } catch {
+      showToast("Copy failed.", "error");
+    }
+  });
 }
