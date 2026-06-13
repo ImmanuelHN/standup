@@ -4,255 +4,601 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Daily Standup Tracker</title>
+    <title>Standup Tracker · PMO Portal</title>
 
     <link rel="stylesheet" href="Style.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 
 <body data-theme="dark">
 
-    <!-- HEADER -->
-    <header class="header">
-        <div class="header-left">
-            <div class="logo">
-                <span>📊</span>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-mark">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.9"/>
+                    <rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.5"/>
+                    <rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.5"/>
+                    <rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.9"/>
+                </svg>
             </div>
-
-            <div>
-                <h1>Daily Standup Tracker</h1>
-                <p>PMO Developer Status Management Portal</p>
-            </div>
+            <span class="brand-name">StandupOS</span>
         </div>
 
-        <div class="header-right">
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-tab="dashboard">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M2 7.5L8 2.5l6 5V13.5a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="standup">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span>Daily Update</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="summary">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span>Director Summary</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="tasks">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M2.5 4.5h11m-11 3.5h11m-11 3.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <circle cx="2" cy="4.5" r="0.75" fill="currentColor"/>
+                    <circle cx="2" cy="8" r="0.75" fill="currentColor"/>
+                    <circle cx="2" cy="11.5" r="0.75" fill="currentColor"/>
+                </svg>
+                <span>Task List</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="notes">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 2v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5L9.5 2H4a1 1 0 0 0-1 1z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M9 2v3a1 1 0 0 0 1 1h3M6 9h4M6 12h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span>Notes & To-Do</span>
+            </a>
+        </nav>
 
-            <button id="themeToggle" class="theme-btn">
-                🌙 Dark Mode
+        <div class="sidebar-footer">
+            <button id="themeToggle" class="theme-toggle" title="Toggle theme">
+                <svg class="icon-sun" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <svg class="icon-moon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M13.5 9.5A6 6 0 0 1 6.5 2.5a6 6 0 1 0 7 7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>
+                <span class="theme-label">Dark</span>
             </button>
-
         </div>
-    </header>
-
-    <!-- DASHBOARD CARDS -->
-    <section class="dashboard">
-
-        <div class="card stat-card">
-            <h3>Developers Updated</h3>
-            <h2 id="updatedCount">0</h2>
-        </div>
-
-        <div class="card stat-card">
-            <h3>Pending Updates</h3>
-            <h2 id="pendingCount">0</h2>
-        </div>
-
-        <div class="card stat-card">
-            <h3>Total Entries</h3>
-            <h2 id="entryCount">0</h2>
-        </div>
-
-    </section>
+    </aside>
 
     <!-- MAIN CONTENT -->
-    <main class="container">
+    <div class="main-wrapper">
 
-        <!-- LEFT PANEL -->
-        <section class="card form-card">
-
-            <div class="section-header">
-                <h2>Developer Standup Update</h2>
-                <span id="currentDate"></span>
+        <!-- TOP BAR -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                <span class="page-date" id="currentDate"></span>
             </div>
 
-            <form id="standupForm">
+            <div class="topbar-right">
+                <div class="stat-pills">
+                    <div class="stat-pill">
+                        <span class="stat-dot dot-green"></span>
+                        <span id="updatedCount">0</span>
+                        <span class="stat-label">Updated</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-dot dot-amber"></span>
+                        <span id="pendingCount">0</span>
+                        <span class="stat-label">Pending</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-dot dot-blue"></span>
+                        <span id="entryCount">0</span>
+                        <span class="stat-label">Total</span>
+                    </div>
+                </div>
+            </div>
+        </header>
 
-                <!-- Developer Selection -->
-                <div class="form-group">
+        <!-- PAGE: DASHBOARD -->
+        <div class="page active" id="page-dashboard">
+            <div class="panel-header" style="padding: 0 0 10px 0; margin-bottom: 15px; border-bottom: 1px solid var(--border);">
+                <div>
+                    <h2 class="panel-title">Overview</h2>
+                    <p class="panel-sub">Key metrics and status statistics</p>
+                </div>
+                <button id="refreshStatsBtn" class="btn btn-ghost btn-sm" title="Refresh Stats">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                        <path d="M13.65 4.75A6 6 0 1 0 14 8h-1.5a4.5 4.5 0 1 1-.8-2.65L10 7h4V3l-1.35 1.75z" fill="currentColor"/>
+                    </svg>
+                    Refresh
+                </button>
+            </div>
+            
+            <div class="stats-grid" id="dashboardStats">
+                <!-- 6 stat cards injected by JS -->
+            </div>
+            
+            <section class="panel mt-20">
+                <div class="panel-header">
+                    <h2>📌 Sticky Notes</h2>
+                    <a href="#" data-tab="notes" class="btn btn-ghost btn-sm">View All</a>
+                </div>
+                <div class="notes-preview-grid" id="notesPreview">
+                    <!-- active notes injected by JS -->
+                </div>
+            </section>
+            
+            <section class="panel mt-20">
+                <div class="panel-header">
+                    <h2>✅ To-Do List</h2>
+                    <button id="dashAddTodo" class="btn btn-primary btn-sm">+ Add To-Do</button>
+                </div>
+                <div id="todosPreview" style="padding: 0 20px 20px 20px;">
+                    <!-- todos injected by JS -->
+                </div>
+            </section>
+        </div>
 
-                    <label>
-                        Developer Name
-                    </label>
+        <!-- PAGE: STANDUP -->
+        <div class="page" id="page-standup">
+            <div class="two-col">
 
-                    <div class="developer-row">
-
-                        <select id="developer" required>
-                            <option value="">
-                                Select Developer
-                            </option>
-                        </select>
-
-                        <button type="button" id="openDeveloperModal" class="secondary-btn">
-                            + Add Developer
-                        </button>
-
+                <!-- LEFT: FORM -->
+                <section class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2 class="panel-title">Standup Form</h2>
+                            <p class="panel-sub">Fill in today's developer update</p>
+                        </div>
                     </div>
 
-                </div>
+                    <form id="standupForm" class="standup-form" novalidate>
 
-                <!-- Completed Tasks -->
-                <div class="form-group">
-                    <label>
-                        Completed Tasks
-                    </label>
+                        <!-- Developer -->
+                        <div class="field-group">
+                            <label class="field-label" for="developer">Developer</label>
+                            <div class="field-row">
+                                <div class="select-wrapper">
+                                    <select id="developer" required>
+                                        <option value="">Select developer…</option>
+                                    </select>
+                                    <svg class="select-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                        <path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <button type="button" id="openDeveloperModal" class="btn btn-ghost btn-sm">
+                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                        <path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                    Add Dev
+                                </button>
+                            </div>
+                        </div>
 
-                    <textarea id="completedTasks" placeholder="Enter completed tasks..." required></textarea>
-                </div>
+                        <!-- Task fields -->
+                        <div class="field-group">
+                            <label class="field-label" for="completedTasks">
+                                <span class="label-badge badge-green">✓</span>
+                                Completed Tasks
+                            </label>
+                            <textarea id="completedTasks" placeholder="List tasks completed so far…" required rows="3"></textarea>
+                        </div>
 
-                <!-- In Progress -->
-                <div class="form-group">
-                    <label>
-                        Current In Progress Tasks
-                    </label>
+                        <div class="field-group">
+                            <label class="field-label" for="inProgressTasks">
+                                <span class="label-badge badge-blue">↻</span>
+                                In Progress
+                            </label>
+                            <textarea id="inProgressTasks" placeholder="Tasks currently being worked on…" required rows="3"></textarea>
+                        </div>
 
-                    <textarea id="inProgressTasks" placeholder="Enter current progress..." required></textarea>
-                </div>
+                        <div class="field-group">
+                            <label class="field-label" for="deliverables">
+                                <span class="label-badge badge-purple">⬡</span>
+                                Today's Deliverables
+                            </label>
+                            <textarea id="deliverables" placeholder="What will be delivered by EOD…" required rows="3"></textarea>
+                        </div>
 
-                <!-- Deliverables -->
-                <div class="form-group">
-                    <label>
-                        Today's Deliverables
-                    </label>
+                        <div class="field-row fields-half">
+                            <div class="field-group">
+                                <label class="field-label" for="blockers">
+                                    <span class="label-badge badge-red">⊘</span>
+                                    Blockers
+                                </label>
+                                <textarea id="blockers" placeholder="Enter blockers or type -" required rows="3"></textarea>
+                            </div>
+                            <div class="field-group">
+                                <label class="field-label" for="clarifications">
+                                    <span class="label-badge badge-amber">?</span>
+                                    Clarifications
+                                </label>
+                                <textarea id="clarifications" placeholder="Clarifications needed or type -" required rows="3"></textarea>
+                            </div>
+                        </div>
 
-                    <textarea id="deliverables" placeholder="Expected deliverables for today..." required></textarea>
-                </div>
+                        <div class="field-group mt-20">
+                            <label class="field-label" for="comments">
+                                <span class="label-badge badge-purple">💬</span>
+                                Comments / Updates
+                            </label>
+                            <textarea id="comments" placeholder="Any additional comments or mid-day updates about this standup…" rows="3"></textarea>
+                        </div>
 
-                <!-- Blockers -->
-                <div class="form-group">
-                    <label>
-                        Blockers / Dependencies
-                    </label>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                    <path d="M2 7l4 4 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Save Update
+                            </button>
+                            <button type="button" id="generateSummary" class="btn btn-secondary">
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                    <path d="M2 4h10M2 7h7M2 10h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                                Preview Summary
+                            </button>
+                        </div>
 
-                    <textarea id="blockers" placeholder="Enter blockers or type '-'" required></textarea>
-                </div>
+                    </form>
+                </section>
 
-                <!-- Clarifications -->
-                <div class="form-group">
-                    <label>
-                        Clarifications Required
-                    </label>
+                <!-- RIGHT: PREVIEW -->
+                <section class="panel panel-preview">
+                    <div class="panel-header">
+                        <div>
+                            <h2 class="panel-title">Teams Summary</h2>
+                            <p class="panel-sub">Ready to paste into your chat</p>
+                        </div>
+                        <button id="copySummary" class="btn btn-ghost btn-sm">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <rect x="5" y="5" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.3"/>
+                                <path d="M9 5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h2" stroke="currentColor" stroke-width="1.3"/>
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
 
-                    <textarea id="clarifications" placeholder="Enter clarifications or type '-'" required></textarea>
-                </div>
+                    <div id="summaryOutput" class="summary-output">
+                        <div class="empty-state">
+                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" opacity="0.25">
+                                <rect x="6" y="6" width="28" height="28" rx="4" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M12 15h16M12 20h12M12 25h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <p>Fill the form and click Preview Summary</p>
+                        </div>
+                    </div>
+                </section>
 
-                <!-- Buttons -->
-                <div class="action-buttons">
-
-                    <button type="submit" class="primary-btn">
-                        Save Update
-                    </button>
-
-                    <button type="button" id="generateSummary" class="secondary-btn">
-                        Generate Teams Summary
-                    </button>
-
-                </div>
-
-            </form>
-
-        </section>
-
-        <!-- RIGHT PANEL -->
-        <section class="card summary-card">
-
-            <div class="section-header">
-                <h2>Teams Summary Preview</h2>
-
-                <button id="copySummary" class="secondary-btn">
-                    Copy
-                </button>
             </div>
-
-            <div id="summaryOutput" class="summary-output">
-                Developer summary will appear here...
-            </div>
-
-        </section>
-
-    </main>
-
-    <!-- DAILY SUMMARY SECTION -->
-    <section class="daily-summary-section">
-
-        <div class="card">
-
-            <div class="section-header">
-
-                <h2>
-                    Director Daily Summary
-                </h2>
-
-                <button id="generateDirectorSummary" class="primary-btn">
-                    Generate Daily Summary
-                </button>
-
-            </div>
-
-            <div id="directorSummaryOutput" class="summary-output">
-                Daily summary will appear here...
-            </div>
-
         </div>
 
-    </section>
+        <!-- PAGE: DIRECTOR SUMMARY -->
+        <div class="page" id="page-summary">
+            <section class="panel panel-wide">
+                <div class="panel-header">
+                    <div>
+                        <h2 class="panel-title">Director Daily Summary</h2>
+                        <p class="panel-sub">Aggregated report for today's standups</p>
+                    </div>
+                    <div class="header-actions">
+                        <button id="generateDirectorSummary" class="btn btn-primary">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            Generate Report
+                        </button>
+                        <button id="copyDirectorSummary" class="btn btn-ghost btn-sm">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <rect x="5" y="5" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.3"/>
+                                <path d="M9 5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h2" stroke="currentColor" stroke-width="1.3"/>
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+                </div>
+
+                <div id="directorSummaryOutput" class="summary-output summary-output-tall">
+                    <div class="empty-state">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" opacity="0.25">
+                            <circle cx="20" cy="20" r="14" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M20 13v7l5 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        <p>Click Generate Report to pull today's standup data</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- PAGE: TASK LIST -->
+        <div class="page" id="page-tasks">
+            <div class="filter-bar">
+                <input type="text" id="taskSearch" placeholder="Search by developer or keyword…" />
+                <select id="taskStatusFilter">
+                    <option value="All">All Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Completed">Completed</option>
+                </select>
+                <select id="taskDateFilter">
+                    <option value="All">All Dates</option>
+                    <option value="Today">Today</option>
+                    <option value="Week">This Week</option>
+                </select>
+            </div>
+            <div id="taskListContainer">
+                <!-- task groups injected by JS -->
+            </div>
+        </div>
+
+        <!-- PAGE: NOTES & TO-DO -->
+        <div class="page" id="page-notes">
+            <div class="sub-tabs">
+                <button class="sub-tab active" data-subtab="notes">📝 Notes</button>
+                <button class="sub-tab" data-subtab="todos">✅ To-Do List</button>
+            </div>
+            <div class="sub-page active" id="subpage-notes">
+                <div class="panel-header" style="padding: 0 0 10px 0; margin-bottom: 15px;">
+                    <h2>Sticky Notes</h2>
+                    <button id="addNoteBtn" class="btn btn-primary btn-sm">+ Add Note</button>
+                </div>
+                <div class="notes-grid" id="notesGrid">
+                    <!-- note cards injected by JS -->
+                </div>
+            </div>
+            <div class="sub-page" id="subpage-todos">
+                <div class="panel-header" style="padding: 0 0 10px 0; margin-bottom: 15px;">
+                    <h2>To-Do List</h2>
+                    <button id="addTodoBtn" class="btn btn-primary btn-sm">+ Add To-Do</button>
+                </div>
+                <div id="todoList">
+                    <!-- todo items injected by JS -->
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /main-wrapper -->
 
     <!-- ADD DEVELOPER MODAL -->
-    <div id="developerModal" class="modal">
-
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h2>Add Developer</h2>
-
-                <button id="closeDeveloperModal" class="close-btn">
-                    ✕
+    <div id="developerModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Add Developer">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3>Add Developer</h3>
+                <button id="closeDeveloperModal" class="btn-icon" aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
                 </button>
             </div>
-
             <div class="modal-body">
-
-                <label>
-                    Developer Name
-                </label>
-
-                <input type="text" id="newDeveloperName" placeholder="Enter developer name">
-
-                <button id="saveDeveloper" class="primary-btn modal-save-btn">
-                    Save Developer
-                </button>
-
+                <label class="field-label" for="newDeveloperName">Full Name</label>
+                <input type="text" id="newDeveloperName" placeholder="e.g. Arjun Sharma" autocomplete="off" />
+                <button id="saveDeveloper" class="btn btn-primary btn-block">Save Developer</button>
             </div>
-
         </div>
+    </div>
 
+    <!-- EDIT TASK MODAL -->
+    <div id="editTaskModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Edit Task Comments">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3>Edit Task Details</h3>
+                <button id="closeEditTaskModal" class="btn-icon close-modal-btn" aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="field-group">
+                    <label class="field-label">Task Info</label>
+                    <p id="editTaskInfo" class="text-muted" style="font-size: 13px; font-weight: 500;"></p>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="editTaskComments">Comments</label>
+                    <textarea id="editTaskComments" placeholder="Enter comments/updates..." rows="3"></textarea>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="editTaskStatus">Status</label>
+                    <div class="select-wrapper">
+                        <select id="editTaskStatus">
+                            <option value="Pending">Pending</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                        <svg class="select-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <button id="saveTaskBtn" class="btn btn-primary btn-block">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD NOTE MODAL -->
+    <div id="addNoteModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Add Note">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3>Add Sticky Note</h3>
+                <button id="closeAddNoteModal" class="btn-icon close-modal-btn" aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="field-group">
+                    <label class="field-label" for="newNoteTitle">Title (Max 80 chars)</label>
+                    <input type="text" id="newNoteTitle" placeholder="e.g. Server Migration" maxlength="80" required autocomplete="off" />
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="newNoteContent">Content</label>
+                    <textarea id="newNoteContent" placeholder="Enter note content..." required rows="4"></textarea>
+                </div>
+                <button id="saveNoteBtn" class="btn btn-primary btn-block">Add Note</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT NOTE MODAL -->
+    <div id="editNoteModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Edit Note">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3>Edit Sticky Note</h3>
+                <button id="closeEditNoteModal" class="btn-icon close-modal-btn" aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="field-group">
+                    <label class="field-label" for="editNoteTitle">Title</label>
+                    <input type="text" id="editNoteTitle" placeholder="Title..." maxlength="80" required autocomplete="off" />
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="editNoteContent">Content</label>
+                    <textarea id="editNoteContent" placeholder="Content..." required rows="4"></textarea>
+                </div>
+                <button id="updateNoteBtn" class="btn btn-primary btn-block">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD TODO MODAL -->
+    <div id="addTodoModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Add To-Do">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3>Add To-Do Item</h3>
+                <button id="closeAddTodoModal" class="btn-icon close-modal-btn" aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="field-group">
+                    <label class="field-label" for="newTodoTitle">Title (Required)</label>
+                    <input type="text" id="newTodoTitle" placeholder="e.g. Schedule meeting with CEO" required autocomplete="off" />
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="newTodoDesc">Description</label>
+                    <textarea id="newTodoDesc" placeholder="Additional details..." rows="3"></textarea>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="newTodoAssignedBy">Assigned By</label>
+                    <input type="text" id="newTodoAssignedBy" placeholder="e.g. Director or self" autocomplete="off" />
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="newTodoPriority">Priority</label>
+                    <div class="select-wrapper">
+                        <select id="newTodoPriority">
+                            <option value="High">High</option>
+                            <option value="Medium" selected>Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                        <svg class="select-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="newTodoDueDate">Due Date</label>
+                    <input type="date" id="newTodoDueDate" />
+                </div>
+                <button id="saveTodoBtn" class="btn btn-primary btn-block">Add To-Do</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT TODO MODAL -->
+    <div id="editTodoModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Edit To-Do">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3>Edit To-Do Item</h3>
+                <button id="closeEditTodoModal" class="btn-icon close-modal-btn" aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="field-group">
+                    <label class="field-label" for="editTodoTitle">Title (Required)</label>
+                    <input type="text" id="editTodoTitle" placeholder="Title..." required autocomplete="off" />
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="editTodoDesc">Description</label>
+                    <textarea id="editTodoDesc" placeholder="Additional details..." rows="3"></textarea>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="editTodoAssignedBy">Assigned By</label>
+                    <input type="text" id="editTodoAssignedBy" placeholder="Assigned By..." autocomplete="off" />
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="editTodoPriority">Priority</label>
+                    <div class="select-wrapper">
+                        <select id="editTodoPriority">
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                        <svg class="select-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="editTodoDueDate">Due Date</label>
+                    <input type="date" id="editTodoDueDate" />
+                </div>
+                <button id="updateTodoBtn" class="btn btn-primary btn-block">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIRMATION MODAL -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-box modal-sm">
+            <div class="modal-head">
+                <h3 id="confirmTitle">Confirm Delete</h3>
+                <button class="btn-icon" id="closeConfirmModal">✕</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage" class="text-muted" style="font-size: 13px;"></p>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelConfirm">Cancel</button>
+                    <button class="btn btn-danger" id="proceedConfirm">Delete</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- LOADER -->
-    <div id="loader" class="loader-overlay hidden">
-
-        <div class="loader-card">
-            <div class="spinner"></div>
-            <p>Please wait...</p>
+    <div id="loader" class="loader-overlay hidden" aria-live="polite" aria-label="Loading">
+        <div class="loader-box">
+            <div class="loader-ring">
+                <div></div><div></div><div></div><div></div>
+            </div>
+            <p class="loader-text">Saving…</p>
         </div>
-
     </div>
 
-    <!-- SUCCESS TOAST -->
-    <div id="toast" class="toast">
-        Saved Successfully
-    </div>
-
-    <!-- FOOTER -->
-    <footer class="footer">
-        <p>
-            Daily Standup Tracker • PMO Management Portal
-        </p>
-    </footer>
+    <!-- TOAST -->
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <script src="app.js"></script>
-
 </body>
-
 </html>
